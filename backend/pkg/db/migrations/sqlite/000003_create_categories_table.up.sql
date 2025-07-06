@@ -1,7 +1,7 @@
 
     -- create categories table :
     CREATE TABLE IF NOT EXISTS categories (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     c_name TEXT UNIQUE NOT NULL);
 
     -- insert inside categories

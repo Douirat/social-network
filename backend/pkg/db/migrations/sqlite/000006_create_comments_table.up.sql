@@ -1,6 +1,6 @@
      -- Create a table to hold comments' data:
       CREATE TABLE IF NOT EXISTS comments (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
     content TEXT NOT NULL,
     author_id INTEGER NOT NULL,
     post_id INTEGER NOT NULL,
