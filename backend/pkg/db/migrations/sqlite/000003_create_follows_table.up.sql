@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS follows (
     UNIQUE(follower_id, following_id)
 );
 
--- Create indexes for faster follow lookups
 CREATE INDEX IF NOT EXISTS idx_follows_follower_id ON follows(follower_id);
 CREATE INDEX IF NOT EXISTS idx_follows_following_id ON follows(following_id);
 CREATE INDEX IF NOT EXISTS idx_follows_status ON follows(status);
