@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS follows (
-    id TEXT PRIMARY KEY,
-    follower_id TEXT NOT NULL,
-    following_id TEXT NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    follower_id INTEGER NOT NULL,
+    following_id INTEGER NOT NULL,
     status TEXT CHECK(status IN ('pending', 'accepted', 'declined')) DEFAULT 'pending',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
