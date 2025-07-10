@@ -1,0 +1,90 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modalContent {
+    background-color: var(--container-color);
+    padding: 20px;
+    border-radius: 12px;
+    width: 50%;
+    min-width: 400px;
+    overflow-y: auto;
+    padding-top: 30px;
+    padding-bottom: 0px;
+  }
+  
+  .modalTitle {
+    color: var(--text-color);
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: -20px;
+  }
+  
+  .buttonGroup {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .cancelButton, .updateButton {
+    padding: 8px 16px;
+    border: none;
+    font-size: 15px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+  }
+
+  .updateButton {
+    background-color: var(--purple-color);
+  }
+  
+  /* Ensure the layout matches createPost.module.css */
+  .modalContent :global(.Post) {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .modalContent :global(.ContentImageContainer) {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 4%;
+  }
+  
+  .modalContent :global(.TextArea) {
+    width: 66%;
+  }
+  
+  .modalContent :global(.custumFileUpload) {
+    width: 30%;
+  }
+  
+  .modalContent :global(.Privacy) {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .modalContent :global(.usersListContainer) {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 180px;
+  }
+
