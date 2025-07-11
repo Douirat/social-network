@@ -1,0 +1,55 @@
+.profileStats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    gap: 4%;
+    font-size: 12px;
+    width: 50%;
+    background-color: var(--inner-container-color);
+    padding: 10px 5px;
+    border-radius: 20px;
+  }
+  
+  .stat {
+    text-align: center;
+    height: 80px;
+    width: 30%;
+    padding: 10px 0px;
+    overflow-y: visible;
+    border-radius: 20px;
+    overflow-wrap: break-word;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .stat:hover {
+    background-color: var(--container-color);
+  }
+  
+  .statValue {
+    font-weight: bold;
+    font-size: 18px;
+    color: var(--primary-color);
+  }
+  
+  .statLabel {
+    color: var(--SVG-color);
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+
+  .usersListContainer {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    background-color: var(--container-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 10px;
+    width: 200px;
+  }

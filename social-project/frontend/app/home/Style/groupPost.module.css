@@ -1,0 +1,32 @@
+.groupPostContainer {
+    background-color: black;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--text-color);
+    border-radius: 15px ;
+}
+
+.groupName {
+    font-weight: bold;
+}
+
+.groupName {
+    font-size: 0.9em;
+    color: var(--text-color);
+    margin-bottom: 8px;
+  }
+  
+  .groupName a {
+    /*color: #0070f3;*/
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  .groupName a:hover {
+    text-decoration: underline;
+  }
