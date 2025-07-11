@@ -1,0 +1,61 @@
+.container {
+    display: flex;
+  position: relative;
+  width: 100%;
+  max-height: 440px;
+  max-width: 350px;
+  background-color: var(--container-color);
+  gap: 20px;
+  padding: 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.listContainer {
+    max-height: 440px;
+    height: fit-content;
+    box-sizing: border-box;
+    padding: 30px 0px 20px 0px;
+    display: flex;
+    flex-direction: column;
+    width:90%;
+    align-items: center;
+    justify-content: center;
+    gap: 10px
+
+}
+
+.invitationList {
+    flex:1;
+    width:100%;
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.Btn {
+  width: fit-content;
+  background-color: var(--purple-color);
+  font-size: 13px;
+  color: var(--text-color);
+  font-weight: bold;
+  border-radius: 10px;
+  padding: 5px 6px;
+}
+
+.Btn:hover {
+  opacity: 0.8;
+}
+
+.pendingBtn {
+  background-color: var(--secondary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}

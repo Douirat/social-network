@@ -1,0 +1,113 @@
+.HomeContent {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 3%;
+    padding: 1% 0 1% 3%;
+    margin-top: 60px;
+}
+
+.LeftSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 21%;
+    gap: 16px;
+}
+
+.Posts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 45%;
+    gap: 16px;
+}
+
+.RightSection {
+    width: 25%;
+}
+
+/* Add these new styles for GeneralPost component */
+.postCard {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    padding: 20px;
+    width: 100%;
+}
+
+.postHeader {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.profilePicture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.postInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.postAuthor {
+    font-weight: bold ;
+    font-size: 24px; 
+    color: red;
+    text-decoration: none;
+}
+
+.postTime {
+    font-size: 0.8em;
+    color: black;
+}
+
+.postContent {
+    margin-bottom: 15px;
+    text-decoration: none;
+    color: black;
+}
+
+.postTitle {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color:black;
+}
+
+.postImageContainer {
+    margin-top: 10px;
+}
+
+.postImage {
+    max-width: 100%;
+    border-radius: 4px;
+}
+
+.postActions {
+    display: flex;
+    justify-content: space-between;
+}
+
+.actionButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: var(--text-color);
+}
+
+.actionIcon {
+    margin-right: 5px;
+}
+
+.liked {
+    color: var(--secondary-color);
+}
