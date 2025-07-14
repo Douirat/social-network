@@ -59,7 +59,7 @@ export const logout = async (): Promise<boolean> => {
 
 export const login = async (emailOrUsername: string, password: string): Promise<{ success: boolean; error?: string; user?: User }> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +94,7 @@ export const login = async (emailOrUsername: string, password: string): Promise<
 
 export const signup = async (formData: FormData): Promise<{ success: boolean; error?: string; user?: User }> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/signup`, {
+    const response = await fetch(`${API_BASE_URL}/api/signup`, {
       method: 'POST',
       body: formData,
       credentials: 'include',
