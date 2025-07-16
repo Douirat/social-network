@@ -148,21 +148,17 @@ func (userHandler *UsersHandlers) UsersLoginHandler(w http.ResponseWriter, r *ht
 		utils.ResponseJSON(w, http.StatusBadRequest, map[string]any{"message": "Invalid JSON format"})
 		return
 	}
-
 	fmt.Println("Parsed credentials:", credentials)
 
 	user, err := userHandler.userServ.AuthenticateUser(credentials.Email, credentials.Password)
 	if err != nil {
 		fmt.Println("User login handler 3 called", err)
-
 		utils.ResponseJSON(w, http.StatusUnauthorized, map[string]any{"message": "Authentication failed"})
 		return
 	}
-
 	token, expiresAt, err := userHandler.sessionServ.CreateSession(user.Id)
 	if err != nil {
 		fmt.Println("User login handler 4 called")
-
 		utils.ResponseJSON(w, http.StatusInternalServerError, map[string]any{"message": "Failed to create session"})
 		return
 	}
