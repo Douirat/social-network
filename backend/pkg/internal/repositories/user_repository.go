@@ -56,8 +56,6 @@ func (userRepo *UsersRepository) RegisterNewUser(user *models.User) error {
 	}
 	return nil
 }
- 
-
 // get userbyemail
 func (userRepo *UsersRepository) GetUserByEmail(email string) (*models.User, error) {
 	query := `SELECT id, nickname, username, date_of_birth, gender, password_hash, email, first_name, last_name, about_me FROM users WHERE email = ?`
@@ -79,7 +77,6 @@ func (userRepo *UsersRepository) GetUserByEmail(email string) (*models.User, err
 	}
 	return user, nil
 }
-
 // get user bu id:
 func (userRepo *UsersRepository) GetUserByID(id int) (*models.User, error) {
 	// Fixed SQL query missing quotes and fixing syntax:
@@ -94,7 +91,6 @@ func (userRepo *UsersRepository) GetUserByID(id int) (*models.User, error) {
 	}
 	return user, nil
 }
-
 // Get all users:
 func (userRepo *UsersRepository) GetSortedUsersForChat(myID, offset, limit int) ([]*models.ChatUser, error) {
 	query := `

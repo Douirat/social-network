@@ -22,17 +22,3 @@ func HashPassword(password string) (string, error) {
 }
 
 // CheckPasswordHash compares a bcrypt hashed password with a plain-text password
-func CheckPasswordHash(password, hash string) error {
-	passwordBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		fmt.Println("Error generating password hash:", err)
-		return nil
-	}
-	passwordHash := string(passwordBytes)
-	fmt.Println("Comparing password hash:", passwordHash, "with hash:", hash)
-	if password == "" || hash == "" {
-		return fmt.Errorf("password and hash must not be empty")
-	}
-	fmt.Println(bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)))
-	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-}

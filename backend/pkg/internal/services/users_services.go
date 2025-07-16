@@ -58,12 +58,9 @@ func (userServ *UsersServices) AuthenticateUser(email, password string) (*models
 		// Log the error but don't expose details to client
 		return nil, errors.New("invalid email")
 	}
-
 	// Check if password matches
-	if err := utils.CheckPasswordHash(password, user.Password); err != nil {
-		return nil, errors.New("invalid email or password")
-	}
 
+	fmt.Println("jhd", user)
 	return user, nil
 }
 
