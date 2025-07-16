@@ -23,7 +23,6 @@ func HashPassword(password string) (string, error) {
 
 func CheckPasswordHash(password, hash string) error {
 	password = "Houssam@123"
-	hash
 	fmt.Println("hash", hash)
 	fmt.Println("password", password)
 	if password == "" || hash == "" {
