@@ -21,31 +21,58 @@ type UsersRepository struct {
 }
 
 // Create a new instance from the user crepository structure:
+// NewUsersRepository expects a valid, non-nil *sql.DB connection.
+// Ensure you initialize the database connection before calling this function.
 func NewUsersRepository(database *sql.DB) *UsersRepository {
+	if database == nil {
+		panic("database connection is nil in NewUsersRepository")
+	}
 	userRepo := new(UsersRepository)
 	userRepo.db = database
-	// return &UsersRepository{db: database}
 	return userRepo
 }
 
 // Create a function to register a new user:
 func (userRepo *UsersRepository) RegisterNewUser(user *models.User) error {
-	query := "INSERT INTO users (nick_name, age, gender, first_name, last_name, email, password) VALUES (?, ?, ?, ?, ?, ?, ?)"
-	_, err := userRepo.db.Exec(query, user.NickName, user.Age, user.Gender, user.FirstName, user.LastName, user.Email, user.Password)
+	query := `
+		INSERT INTO users (
+			nickname, username, date_of_birth, gender, password_hash, email, first_name, last_name, about_me
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`
+	_, err := userRepo.db.Exec(
+		query,
+		user.NickName,
+		user.Username,
+		user.DateOfBirth,
+		user.Gender,
+		user.Password,
+		user.Email,
+		user.FirstName,
+		user.LastName,
+		user.About,
+	)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to register user: %v", err)
 	}
 	return nil
 }
+ 
 
 // get userbyemail
 func (userRepo *UsersRepository) GetUserByEmail(email string) (*models.User, error) {
-	// Fixed SQL query missing quotes
-	query := "SELECT * FROM users WHERE email = ?"
+	query := `SELECT id, nickname, username, date_of_birth, gender, password_hash, email, first_name, last_name, about_me FROM users WHERE email = ?`
 	user := &models.User{}
-	// Fixed Scan by using address-of fields
 	err := userRepo.db.QueryRow(query, email).Scan(
-		&user.Id, &user.NickName, &user.Age, &user.Gender, &user.FirstName, &user.LastName, &user.Email, &user.Password,
+		&user.Id,
+		&user.NickName,
+		&user.Username,
+		&user.DateOfBirth,
+		&user.Gender,
+		&user.Password,
+		&user.Email,
+		&user.FirstName,
+		&user.LastName,
+		&user.About,
 	)
 	if err != nil {
 		return nil, err

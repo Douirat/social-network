@@ -15,7 +15,7 @@ const MIN_PASSWORD_LENGTH = 8;
 const MAX_NAME_LENGTH = 50;
 const MAX_NICKNAME_LENGTH = 30;
 const MAX_ABOUTME_LENGTH = 500;
-const MAX_EMAIL_LENGTH = 254; 
+const MAX_EMAIL_LENGTH = 254;
 
 // Regex patterns matching backend validation
 const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/;
@@ -24,11 +24,14 @@ const EMAIL_REGEX = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,4}$/;
 const validateForm = (formData: FormData): string | null => {
   const username = formData.get('username') as string;
   const email = formData.get('email') as string;
+  const profilepicture = formData.get('profileImg') as File | null;
   const password = formData.get('password') as string;
   const firstName = formData.get('firstName') as string;
   const lastName = formData.get('lastName') as string;
   const nickname = formData.get('nickname') as string;
+  const gender = formData.get('gender') as string;
   const dateOfBirth = formData.get('dateOfBirth') as string;
+
 
   // Username validation
   if (username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH) {
@@ -239,6 +242,7 @@ const Page = () => {
                 />
               </div>
             </div>
+
             <div className={styles.inputContainer}>
               <svg
                 viewBox="0 0 16 16"
@@ -283,7 +287,21 @@ const Page = () => {
                   required
                 />
               </div>
-
+              <div className={styles.inputContainer}>
+                <select
+                  name="gender"
+                  className={styles.inputField}
+                  required
+                  defaultValue=""
+                >
+                  <option value="" disabled>
+                    Select Gender
+                  </option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="prefer-not-to-say">Prefer not to say</option>
+                </select>
+              </div>
               <div className={styles.inputContainer}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

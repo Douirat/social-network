@@ -19,6 +19,84 @@ var (
 )
 
 func init() {
+	// Database setup (path and migration)
+	dbPath := "./data/social_network.db"
+	migrationsPath := "./db/migrations/sqlite"
+
+	// Connect and run migrations
+	databaseConnection, mainError = sqlite.ConnectAndMigrate(dbPath, migrationsPath)
+	if mainError != nil {
+		log.Fatalf("Failed to connect and migrate DB: %v", mainError)
+	}
+	log.Println("Database connection successful")
+}
+
+func main() {
+	// Ensure that no database connection errors occurred during init()
+	if mainError != nil {
+		log.Fatalf("Database connection failed: %v", mainError)
+		return
+	}
+	defer databaseConnection.Close() // Ensure DB is closed at the end of the program
+	fmt.Println("Connected successfully to the database")
+
+	// Chat Broker setup
+	chatBroker := services.NewChatBroker()
+	go chatBroker.RunChatBroker()
+
+	// Repositories initialization
+	usersRepository := repositories.NewUsersRepository(databaseConnection)
+	sessionRepository := repositories.NewSessionsRepository(databaseConnection)
+
+	// Services initialization
+	usersServices := services.NewUsersServices(usersRepository)
+	sessionService := services.NewSessionsServices(usersRepository, sessionRepository)
+
+	// Handlers initialization
+	usersHandlers := handlers.NewUsersHandlers(chatBroker, usersServices, sessionService)
+
+	// Router initialization and routes setup
+	mainRouter := router.NewRouter(sessionService)
+
+	// Authentication routes
+	mainRouter.AddRoute("POST", "/api/login", usersHandlers.UsersLoginHandler)
+	mainRouter.AddRoute("POST", "/api/signup", usersHandlers.UsersRegistrationHandler)
+	mainRouter.AddRoute("POST", "/api/logout", usersHandlers.UsersLogoutHandler)
+	mainRouter.AddRoute("GET", "/api/check-session", usersHandlers.UsersCheckSessionHandler)
+
+	// Print message indicating the server is listening
+	fmt.Println("Listening on port: http://localhost:8080/")
+
+	// Start the server and handle incoming requests
+	mainError = http.ListenAndServe(":8080", mainRouter)
+	if mainError != nil {
+		log.Fatalf("Error starting the server: %v", mainError)
+	}
+}
+
+
+
+/* package main
+
+import (
+	"database/sql"
+	"fmt"
+	"log"
+	"net/http"
+
+	"social_network/db/sqlite"
+	"social_network/internal/handlers"
+	"social_network/internal/repositories"
+	"social_network/internal/router"
+	"social_network/internal/services"
+)
+
+var (
+	databaseConnection *sql.DB
+	mainError          error
+)
+
+func init() {
 	dbPath := "./data/social_network.db"
 	migrationsPath := "./db/migrations/sqlite"
 
@@ -159,3 +237,4 @@ mainRouter.AddRoute("GET", "/api/check-session", usersHandlers.UsersCheckSession
 		return
 	}
 }
+ */

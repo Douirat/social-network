@@ -2,6 +2,8 @@ package services
 
 import (
 	"errors"
+	"fmt"
+
 	"social_network/internal/models"
 	"social_network/internal/repositories"
 	"social_network/internal/services/utils"
@@ -12,7 +14,7 @@ type UsersServicesLayer interface {
 	UserRegestration(user *models.User) error
 	AuthenticateUser(email, password string) (*models.User, error)
 	// GetUsersService(offset, limit int) ([]*models.ChatUser, error)
-	GetUserProfile(userId int)(*models.User, error)
+	GetUserProfile(userId int) (*models.User, error)
 }
 
 // Create structure to implement the services innterfase:
@@ -27,7 +29,7 @@ func NewUsersServices(userRepo repositories.UsersRepositoryLayer) *UsersServices
 
 // Register q new user service:
 func (userServ *UsersServices) UserRegestration(user *models.User) error {
-	if user.FirstName == "" || user.LastName == "" || user.Email == "" || !utils.IsValidGender(user.Gender) || user.Age < 18 || user.Password == "" {
+	if user.FirstName == "" || user.LastName == "" || user.Email == "" || user.Password == "" {
 		return errors.New("invalid credentials")
 	}
 	hashedPassword, err := utils.HashPassword(user.Password)
@@ -43,6 +45,7 @@ func (userServ *UsersServices) UserRegestration(user *models.User) error {
 func (userServ *UsersServices) AuthenticateUser(email, password string) (*models.User, error) {
 	// Input validation
 	if email == "" {
+		fmt.Println(email)
 		return nil, errors.New("email is required")
 	}
 	if password == "" {
@@ -53,11 +56,11 @@ func (userServ *UsersServices) AuthenticateUser(email, password string) (*models
 	user, err := userServ.userRepository.GetUserByEmail(email)
 	if err != nil {
 		// Log the error but don't expose details to client
-		return nil, errors.New("invalid email or password")
+		return nil, errors.New("invalid email")
 	}
 
 	// Check if password matches
-	if !utils.CheckPasswordHash(password, user.Password) {
+	if err := utils.CheckPasswordHash(password, user.Password); err != nil {
 		return nil, errors.New("invalid email or password")
 	}
 
@@ -70,6 +73,6 @@ func (userServ *UsersServices) AuthenticateUser(email, password string) (*models
 // }
 
 // extract the user from dataabase:
-func (userServ *UsersServices)GetUserProfile(userId int)(*models.User, error) {
+func (userServ *UsersServices) GetUserProfile(userId int) (*models.User, error) {
 	return userServ.userRepository.GetUserByID(userId)
 }
