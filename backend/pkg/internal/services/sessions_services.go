@@ -31,14 +31,17 @@ func NewSessionsServices(userRepo repositories.UsersRepositoryLayer, sessionRepo
 // CreateSession generates a new session for the user:
 func (sessionServ *SessionService) CreateSession(userID int) (string, time.Time, error) {
 	// Check if user exists:
+	fmt.Println("Creating session for user ID:", userID)
 	_, err := sessionServ.UserRepo.GetUserByID(userID)
 	if err != nil {
+		fmt.Println("Error getting user by ID:", err)
 		return "", time.Time{}, fmt.Errorf("invalid user: %w", err)
 	}
 
 	// Generate token:
 	token, err := utils.GenerateRandomToken(32)
 	if err != nil {
+		fmt.Println("Error generating token:", err)
 		return "", time.Time{}, fmt.Errorf("error generating token: %w", err)
 	}
 
@@ -48,8 +51,10 @@ func (sessionServ *SessionService) CreateSession(userID int) (string, time.Time,
 	// Save to database:
 	err = sessionServ.SessionRepo.CreateSession(userID, token, expiresAt)
 	if err != nil {
+		fmt.Println("Error creating session in repository:", err)
 		return "", time.Time{}, err
 	}
+	//fmt.Println(token, expiresAt)
 	return token, expiresAt, nil
 }
 
@@ -61,10 +66,7 @@ func (sessionServ *SessionService) DestroySession(token string) error {
 // Check if the session is valid:
 func (sessionSev *SessionService) IsValidSession(token string) bool {
 	_, err := sessionSev.SessionRepo.GetSessionByToken(token)
-	if err != nil {	
-		return false
-	}
-	return true
+	return err==nil
 }
 // Check if the session is valid:
 func (sessionSev *SessionService) GetUserIdFromSession(token string) (int, error) {

@@ -15,6 +15,7 @@ type UsersServicesLayer interface {
 	AuthenticateUser(email, password string) (*models.User, error)
 	// GetUsersService(offset, limit int) ([]*models.ChatUser, error)
 	GetUserProfile(userId int) (*models.User, error)
+	GetUseruser(username string) (*models.User, error)
 }
 
 // Create structure to implement the services innterfase:
@@ -32,12 +33,6 @@ func (userServ *UsersServices) UserRegestration(user *models.User) error {
 	if user.FirstName == "" || user.LastName == "" || user.Email == "" || user.Password == "" {
 		return errors.New("invalid credentials")
 	}
-	hashedPassword, err := utils.HashPassword(user.Password)
-	if err != nil {
-		return err
-	}
-	user.NickName = string(user.LastName[0]) + user.FirstName
-	user.Password = hashedPassword
 	return userServ.userRepository.RegisterNewUser(user)
 }
 
@@ -51,12 +46,25 @@ func (userServ *UsersServices) AuthenticateUser(email, password string) (*models
 	if password == "" {
 		return nil, errors.New("password is required")
 	}
-
 	// Get user by email
-	user, err := userServ.userRepository.GetUserByEmail(email)
+	user, err := func() (*models.User, error) {
+		userByUsername, err1 := userServ.userRepository.GetUserBysername(email)
+		userByEmail, err2 := userServ.userRepository.GetUserByEmail(email)
+
+		if err1 != nil && err2 != nil {
+			// Log the error but don't expose details to client
+			return nil, errors.New("invalid email")
+		}
+
+		// Prefer the user found by email, or fallback to username
+		if err2 == nil {
+			return userByEmail, nil
+		}
+		return userByUsername, nil
+	}() // ← function is now called here
 	if err != nil {
-		// Log the error but don't expose details to client
-		return nil, errors.New("invalid email")
+		fmt.Println("Error fetching user:", err)
+		return nil, errors.New("invalid email or password")
 	}
 	// Check if password matches
 	if err := utils.CheckPasswordHash(password, user.Password); err != nil {
@@ -74,4 +82,7 @@ func (userServ *UsersServices) AuthenticateUser(email, password string) (*models
 // extract the user from dataabase:
 func (userServ *UsersServices) GetUserProfile(userId int) (*models.User, error) {
 	return userServ.userRepository.GetUserByID(userId)
+}
+func (userServ *UsersServices) GetUseruser(username string) (*models.User, error) {
+	return userServ.userRepository.GetUserBysername(username)
 }

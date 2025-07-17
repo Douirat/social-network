@@ -73,9 +73,11 @@ func (userHandler *UsersHandlers) UsersRegistrationHandler(w http.ResponseWriter
 	dateOfBirth := r.FormValue("dateOfBirth")
 	about := r.FormValue("aboutMe")
 
-	P, _, err := r.FormFile("profilepicture")
-	fmt.Println(P)
-	fmt.Println(err)
+	_, _, err = r.FormFile("profilepicture")
+	if err != nil {
+		fmt.Println("Error reading profile picture:", err)
+		// Optional: You can decide whether to return or continue if profile pic is optional
+	}
 
 	passwordBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -83,7 +85,6 @@ func (userHandler *UsersHandlers) UsersRegistrationHandler(w http.ResponseWriter
 		return
 	}
 	passwordHash := string(passwordBytes)
-	fmt.Println(passwordHash)
 
 	user := &models.User{
 		NickName:    nickname,
@@ -100,12 +101,21 @@ func (userHandler *UsersHandlers) UsersRegistrationHandler(w http.ResponseWriter
 	err = userHandler.userServ.UserRegestration(user)
 	if err != nil {
 		fmt.Println("Error registering user:", err)
-		utils.ResponseJSON(w, http.StatusInternalServerError, map[string]any{"message": "error to regester"})
+		utils.ResponseJSON(w, http.StatusInternalServerError, map[string]any{"error": "Error registering user"})
 		return
 	}
-	token, expiresAt, err := userHandler.sessionServ.CreateSession(user.Id)
+
+	usr, err := userHandler.userServ.GetUseruser(user.Username)
 	if err != nil {
-		utils.ResponseJSON(w, http.StatusInternalServerError, map[string]any{"message": "Failed to create session"})
+		fmt.Println("Error getting user by username:", err)
+		utils.ResponseJSON(w, http.StatusInternalServerError, map[string]any{"error": "Error retrieving user after registration"})
+		return
+	}
+
+	token, expiresAt, err := userHandler.sessionServ.CreateSession(usr.Id)
+	if err != nil {
+		fmt.Println("Error creating session:", err)
+		utils.ResponseJSON(w, http.StatusInternalServerError, map[string]any{"error": "Failed to create session"})
 		return
 	}
 
@@ -116,18 +126,37 @@ func (userHandler *UsersHandlers) UsersRegistrationHandler(w http.ResponseWriter
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	})
-	utils.ResponseJSON(w, http.StatusOK, map[string]string{"message": "User registered successfully"})
+
+	// ✅ Send proper structure expected by frontend
+	utils.ResponseJSON(w, http.StatusCreated, map[string]any{
+		"success": true,
+		"user": map[string]any{
+			"id":          usr.Id,
+			"username":    usr.Username,
+			"nickname":    usr.NickName,
+			"email":       usr.Email,
+			"first_name":  usr.FirstName,
+			"last_name":   usr.LastName,
+			"gender":      usr.Gender,
+			"dateOfBirth": usr.DateOfBirth,
+			"about":       usr.About,
+			"token":       token,
+			"expires_at":  expiresAt.Format(http.TimeFormat),
+		},
+	})
 }
+
 
 // UsersLoginHandler handles user authentication
 func (userHandler *UsersHandlers) UsersLoginHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("User login handler called")
+
 	err := r.ParseForm()
 	if err != nil {
-		fmt.Println("User login handler 2 called")
 		utils.ResponseJSON(w, http.StatusBadRequest, map[string]any{"message": "Error parsing form"})
 		return
 	}
+
 	type Credentials struct {
 		Email    string `json:"emailOrUsername"`
 		Password string `json:"password"`
@@ -152,13 +181,12 @@ func (userHandler *UsersHandlers) UsersLoginHandler(w http.ResponseWriter, r *ht
 
 	user, err := userHandler.userServ.AuthenticateUser(credentials.Email, credentials.Password)
 	if err != nil {
-		fmt.Println("User login handler 3 called", err)
 		utils.ResponseJSON(w, http.StatusUnauthorized, map[string]any{"message": "Authentication failed"})
 		return
 	}
+
 	token, expiresAt, err := userHandler.sessionServ.CreateSession(user.Id)
 	if err != nil {
-		fmt.Println("User login handler 4 called")
 		utils.ResponseJSON(w, http.StatusInternalServerError, map[string]any{"message": "Failed to create session"})
 		return
 	}
@@ -171,18 +199,17 @@ func (userHandler *UsersHandlers) UsersLoginHandler(w http.ResponseWriter, r *ht
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	response := struct {
-		UserID    int    `json:"user_id"`
-		Token     string `json:"token"`
-		ExpiresAt string `json:"expires_at"`
-	}{
-		UserID:    user.Id,
-		Token:     token,
-		ExpiresAt: expiresAt.Format(http.TimeFormat),
-	}
-
 	userHandler.chatBroker.DeleteIfClientExist(user.Id)
-	utils.ResponseJSON(w, http.StatusCreated, response)
+
+	// ✅ FIXED RESPONSE STRUCTURE
+	utils.ResponseJSON(w, http.StatusCreated, map[string]any{
+		"success": true,
+		"user": map[string]any{
+			"id":         user.Id,
+			"token":      token,
+			"expires_at": expiresAt.Format(http.TimeFormat),
+		},
+	})
 }
 
 // UsersLogoutHandler logs out the user

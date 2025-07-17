@@ -11,6 +11,7 @@ import (
 type UsersRepositoryLayer interface {
 	RegisterNewUser(user *models.User) error
 	GetUserByEmail(email string) (*models.User, error)
+	GetUserBysername(username string) (*models.User, error)
 	GetUserByID(id int) (*models.User, error)
 	GetSortedUsersForChat(myID, offset, limit int) ([]*models.ChatUser, error)
 }
@@ -56,6 +57,26 @@ func (userRepo *UsersRepository) RegisterNewUser(user *models.User) error {
 	}
 	return nil
 }
+func (userRepo *UsersRepository) 	GetUserBysername(username string) (*models.User, error) {
+	query := `SELECT id, nickname, username, date_of_birth, gender, password_hash, email, first_name, last_name, about_me FROM users WHERE username = ?`
+	user := &models.User{}
+	err := userRepo.db.QueryRow(query, username).Scan(
+		&user.Id,
+		&user.NickName,
+		&user.Username,
+		&user.DateOfBirth,
+		&user.Gender,
+		&user.Password,
+		&user.Email,
+		&user.FirstName,
+		&user.LastName,
+		&user.About,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
 // get userbyemail
 func (userRepo *UsersRepository) GetUserByEmail(email string) (*models.User, error) {
 	query := `SELECT id, nickname, username, date_of_birth, gender, password_hash, email, first_name, last_name, about_me FROM users WHERE email = ?`
@@ -80,11 +101,11 @@ func (userRepo *UsersRepository) GetUserByEmail(email string) (*models.User, err
 // get user bu id:
 func (userRepo *UsersRepository) GetUserByID(id int) (*models.User, error) {
 	// Fixed SQL query missing quotes and fixing syntax:
-	query := "SELECT id, nick_name, age, gender, first_name, last_name, email, password FROM users WHERE id = ?"
+	query := "SELECT id, username,nickname, gender, first_name, last_name, email, password_hash FROM users WHERE id = ?"
 	user := &models.User{}
 	// Fixed Scan by using address-of fields:
 	err := userRepo.db.QueryRow(query, id).Scan(
-		&user.Id, &user.NickName, &user.Age, &user.Gender, &user.FirstName, &user.LastName, &user.Email, &user.Password,
+		&user.Id, &user.NickName, &user.Username, &user.Gender, &user.FirstName, &user.LastName, &user.Email, &user.Password,
 	)
 	if err != nil {
 		return nil, err
