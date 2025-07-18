@@ -1,16 +1,26 @@
 #!/bin/bash
 
-curl -X POST \
-  http://localhost:8080/register \
+# Do login request
+response=$(curl -s -X POST http://localhost:8080/login \
   -H "Content-Type: application/json" \
   -d '{
-    "first_name": "alae",
-    "last_name": "alae",
-    "age": 12/12/1999,
-    "gender": "male",
-    "email": "idmossab@gmail.com,
-    "password": "idmossab@gmail.com"
-  }'
+    "email": "idmossab@gmail.com",
+    "password": "idmossab@gmail.com" 
+}')
 
-# Make the script executable with:
-# chmod +x register_curl.sh
+# Show raw response
+echo "Login response: $response"
+
+# Extract token (improved extraction to handle different JSON formats)
+token=$(echo "$response" | jq -r '.session_token // .token // .access_token // ""')
+
+# Check if token is valid
+if [ -n "$token" ] && [ "$token" != "null" ]; then
+  echo "$token" > session_token.txt
+  echo "Token saved to session_token.txt"
+else
+  echo "Error: Could not extract session token."
+  # For debugging, show what fields are available in the response
+  echo "Available JSON fields:"
+  echo "$response" | jq 'keys'
+fi
