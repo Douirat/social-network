@@ -31,7 +31,6 @@ func NewSessionsServices(userRepo repositories.UsersRepositoryLayer, sessionRepo
 // CreateSession generates a new session for the user:
 func (sessionServ *SessionService) CreateSession(userID int) (string, time.Time, error) {
 	// Check if user exists:
-	fmt.Println("Creating session for user ID:", userID)
 	_, err := sessionServ.UserRepo.GetUserByID(userID)
 	if err != nil {
 		fmt.Println("Error getting user by ID:", err)

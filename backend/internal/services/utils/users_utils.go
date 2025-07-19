@@ -22,7 +22,6 @@ func HashPassword(password string) (string, error) {
 }
 
 func CheckPasswordHash(password, hash string) error {
-	fmt.Println("Checking password hash...", password, hash)
 	if password == "" || hash == "" {
 		return fmt.Errorf("password and hash must not be empty")
 	}
@@ -31,7 +30,5 @@ func CheckPasswordHash(password, hash string) error {
 		fmt.Println(err)
 		return err
 	}
-
-	fmt.Println("✅ Password matches!")
 	return nil
 }

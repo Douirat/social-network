@@ -1,39 +1,26 @@
-import { useEffect, useRef } from 'react';
 
-let socket: WebSocket | null = null; // Declare socket variable
+import {API_BASE_URL} from '../config'
 
-export function initWebSocket(clientId: number, onMessage: (message: any) => void): WebSocket {
-    // Initialize the WebSocket connection
 
-    socket = new WebSocket(`ws://localhost:8080/ws?userID=${clientId}`);
+export function initWebSocket(clientId: number, onMessage: (message: any) => void): SharedWorker {
+  const worker = new SharedWorker('/workers/shared-webSocket.js');
+  
+  worker.port.start();
 
-    socket.onopen = function(event) {
-        console.log("WebSocket is open now.");
-    };
+  // You can send some initial data
+  worker.port.postMessage({
+    type: 'init',
+    url: API_BASE_URL
+  });
 
-    socket.onmessage = function(event) {
-        try {
-            // Split the message by newlines to handle multiple JSON objects
-            const messages = event.data.split('\n').filter((msg: string) => msg.trim() !== '');
-            messages.forEach((msg: string) => {
-                const message = JSON.parse(msg);
-                onMessage(message); // Call the provided onMessage function
-            });
-        } catch (error) {
-            console.error("Error parsing WebSocket message:", error);
-            console.error("Problematic message:", event.data);
-        }
-    };
+    worker.port.postMessage({
+    type: 'login',
+    url: API_BASE_URL
+  });
 
-    socket.onclose = function(event) {
-        console.log("WebSocket is closed now.");
-    };
+  worker.port.onmessage = (event) => {
+    onMessage(event.data);
+  };
 
-    socket.onerror = function(error) {
-        console.log("WebSocket error:", error);
-    };
-
-    return socket; // Return the WebSocket instance
+  return worker;
 }
-
-export default initWebSocket;

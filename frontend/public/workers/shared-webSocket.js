@@ -77,9 +77,10 @@ self.onconnect = (e) => {
         }
         break;
 
-        case "api_base_url":
+        case "init":
           api_base_url = data.url
-          console.log("tHE BASE URL FROM THE SHARED WORKER IS: ", data.url);
+          initWebSocket()
+          console.log("The base url is: ", data.url);
         break;
       default:
         console.warn("[Worker] Unknown message type:", type);

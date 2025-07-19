@@ -70,7 +70,6 @@ func (userServ *UsersServices) AuthenticateUser(email, password string) (*models
 	if err := utils.CheckPasswordHash(password, user.Password); err != nil {
 		return nil, errors.New("invalid email or password")
 	}
-	fmt.Println("jhd", user)
 	return user, nil
 }
 

@@ -56,9 +56,13 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
-		return r.Header.Get("Origin") == "http://localhost:8080"
+		origin := r.Header.Get("Origin")
+		fmt.Println("Received Origin:", origin)
+		return origin == "http://localhost:3002"
 	},
 }
+
+
 
 // Instantiate a new chat broker:
 func NewChatBroker() *ChatBroker {
@@ -190,6 +194,10 @@ func (broker *ChatBroker) RunChatBroker() {
 				Content:  "joined the chat",
 				Receiver: 0,
 			}, client.UserId)
+			
+	for i, v := range broker.Clients {
+		fmt.Printf("the %dth user is: %v\n", i, v.UserId)
+	}
 
 		// Client disconnected
 		case client := <-broker.Unregister:
@@ -226,33 +234,33 @@ func (broker *ChatBroker) RunChatBroker() {
 }
 
 // check if the client exist in the first login:
-func (broker *ChatBroker) DeleteIfClientExist(clientId int){
-				broker.Mu.Lock()
-			client, exists := broker.Clients[clientId]
-			if exists {
-				close := &WebsocketMessage{
-					Type:     "closed",
-					Sender:   clientId,
-					Content:  "close this pipe",
-					Receiver: clientId,
-				}
-				client.Pipe <- close
-				delete(broker.Clients, clientId)
-				log.Printf("[INFO] Client %d disconnected. Remaining: %d", clientId, len(broker.Clients))
-			}
-			broker.Mu.Unlock()
+func (broker *ChatBroker) DeleteIfClientExist(clientId int) {
+	broker.Mu.Lock()
+	client, exists := broker.Clients[clientId]
+	if exists {
+		close := &WebsocketMessage{
+			Type:     "closed",
+			Sender:   clientId,
+			Content:  "close this pipe",
+			Receiver: clientId,
+		}
+		client.Pipe <- close
+		delete(broker.Clients, clientId)
+		log.Printf("[INFO] Client %d disconnected. Remaining: %d", clientId, len(broker.Clients))
+	}
+	broker.Mu.Unlock()
 
-			if exists {
-				fmt.Printf("the user was connected and now it's deleted: %v", client.UserId)
-				broker.BroadcastToAll(&WebsocketMessage{
-					Type:     "offline",
-					Sender:   clientId,
-					Content:  "left the chat",
-					Receiver: 0,
-				})
+	if exists {
+		fmt.Printf("the user was connected and now it's deleted: %v", client.UserId)
+		broker.BroadcastToAll(&WebsocketMessage{
+			Type:     "offline",
+			Sender:   clientId,
+			Content:  "left the chat",
+			Receiver: 0,
+		})
 
-				safeClose(client.Pipe)
-			}
+		safeClose(client.Pipe)
+	}
 }
 
 // Broadcast to all users:
@@ -349,6 +357,7 @@ func safeClose(ch chan *WebsocketMessage) {
 
 // Create a new websocket connection:
 func (socket *WebSocketService) CreateNewWebSocket(w http.ResponseWriter, r *http.Request) error {
+	
 	// 1. Method check
 	if r.Method != http.MethodGet {
 		return fmt.Errorf("method not allowed: %s", r.Method)
@@ -367,11 +376,17 @@ func (socket *WebSocketService) CreateNewWebSocket(w http.ResponseWriter, r *htt
 		return fmt.Errorf("invalid session: %v", err)
 	}
 
+		fmt.Println(" dddd  ")
+
 	// 3. Upgrade the connection only after authentication
 	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		return fmt.Errorf("failed to upgrade connection: %v", err)
-	}
+if err != nil {
+	fmt.Printf("Upgrade error: %v\n", err)
+	return fmt.Errorf("failed to upgrade connection: %v", err)
+}
+
+
+
 
 	// 4. Create the client with proper channel initialization
 	client := &Client{
@@ -380,11 +395,13 @@ func (socket *WebSocketService) CreateNewWebSocket(w http.ResponseWriter, r *htt
 		Pipe:       make(chan *WebsocketMessage, 256),
 		SessionID:  token,
 	}
+	fmt.Printf("The new created user is: %v", client)
 	// -----------------------------------
 	// 4.5 Check if user already has an active session
 	socket.Hub.Mu.RLock()
 	oldClient, exists := socket.Hub.Clients[userId]
 	socket.Hub.Mu.RUnlock()
+
 
 	if exists && oldClient != nil && oldClient.Pipe != nil {
 		select {
@@ -404,7 +421,10 @@ func (socket *WebSocketService) CreateNewWebSocket(w http.ResponseWriter, r *htt
 	//--------------------------------
 	// 5. Register the user to hub
 	socket.Hub.Register <- client
+
+
 	
+
 	// 6. Start goroutines
 	go client.ReadPump(socket.Hub, socket)
 	go client.WritePump()

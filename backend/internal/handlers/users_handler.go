@@ -54,11 +54,9 @@ const maxUploadSize = 10 * 1024 * 1024
 
 // UsersRegistrationHandler handles user registration
 func (userHandler *UsersHandlers) UsersRegistrationHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("User registration handler called")
 
 	err := r.ParseMultipartForm(maxUploadSize)
 	if err != nil {
-		fmt.Println("Error parsing form:", err)
 		http.Error(w, "Error parsing form", http.StatusBadRequest)
 		return
 	}
@@ -149,7 +147,7 @@ func (userHandler *UsersHandlers) UsersRegistrationHandler(w http.ResponseWriter
 
 // UsersLoginHandler handles user authentication
 func (userHandler *UsersHandlers) UsersLoginHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("User login handler called")
+
 
 	err := r.ParseForm()
 	if err != nil {
@@ -169,7 +167,7 @@ func (userHandler *UsersHandlers) UsersLoginHandler(w http.ResponseWriter, r *ht
 	}
 	defer r.Body.Close()
 
-	fmt.Println("Raw body:", string(body))
+
 
 	var credentials Credentials
 	err = json.Unmarshal(body, &credentials)
@@ -177,7 +175,7 @@ func (userHandler *UsersHandlers) UsersLoginHandler(w http.ResponseWriter, r *ht
 		utils.ResponseJSON(w, http.StatusBadRequest, map[string]any{"message": "Invalid JSON format"})
 		return
 	}
-	fmt.Println("Parsed credentials:", credentials)
+
 
 	user, err := userHandler.userServ.AuthenticateUser(credentials.Email, credentials.Password)
 	if err != nil {
@@ -200,6 +198,7 @@ func (userHandler *UsersHandlers) UsersLoginHandler(w http.ResponseWriter, r *ht
 	})
 
 	userHandler.chatBroker.DeleteIfClientExist(user.Id)
+	
 
 	// ✅ FIXED RESPONSE STRUCTURE
 	utils.ResponseJSON(w, http.StatusCreated, map[string]any{
@@ -250,7 +249,7 @@ func (userHandler *UsersHandlers) UsersLogoutHandler(w http.ResponseWriter, r *h
 
 // UsersCheckSessionHandler checks if user is logged in
 func (userHandler *UsersHandlers) UsersCheckSessionHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("HHHHHHHHHHHHHHHHHHHHHHH _><_")
+
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
 		utils.ResponseJSON(w, http.StatusUnauthorized, map[string]any{"message": "invalid token"})

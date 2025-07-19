@@ -47,13 +47,18 @@ func main() {
 	// Repositories initialization
 	usersRepository := repositories.NewUsersRepository(databaseConnection)
 	sessionRepository := repositories.NewSessionsRepository(databaseConnection)
+	messageRepository := repositories.NewMessageRepository(databaseConnection)
 
 	// Services initialization
 	usersServices := services.NewUsersServices(usersRepository)
 	sessionService := services.NewSessionsServices(usersRepository, sessionRepository)
+	webSocketService := services.NewWebSocketService(chatBroker, messageRepository, sessionRepository, usersRepository)
+	// messagesService := services.NewMessageService(messageRepository, sessionRepository)
 
 	// Handlers initialization
 	usersHandlers := handlers.NewUsersHandlers(chatBroker, usersServices, sessionService)
+	webSocketHandler := handlers.NewWebSocketHandler(webSocketService, sessionService)
+	// messagesHandler := handlers.NewMessagesHandler(messagesService, sessionService)
 
 	// Router initialization and routes setup
 	mainRouter := router.NewRouter(sessionService)
@@ -64,6 +69,10 @@ func main() {
 	mainRouter.AddRoute("POST", "/api/logout", usersHandlers.UsersLogoutHandler)
 	mainRouter.AddRoute("GET", "/api/check-session", usersHandlers.UsersCheckSessionHandler)
 
+
+	// websocket and chat routes:
+	mainRouter.AddRoute("GET", "/api/ws", webSocketHandler.SocketHandler)
+
 	// Print message indicating the server is listening
 	fmt.Println("Listening on port: http://localhost:8080/")
 
@@ -73,8 +82,6 @@ func main() {
 		log.Fatalf("Error starting the server: %v", mainError)
 	}
 }
-
-
 
 /* package main
 
@@ -237,4 +244,4 @@ mainRouter.AddRoute("GET", "/api/check-session", usersHandlers.UsersCheckSession
 		return
 	}
 }
- */
+*/
