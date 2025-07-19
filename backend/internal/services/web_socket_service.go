@@ -195,9 +195,9 @@ func (broker *ChatBroker) RunChatBroker() {
 				Receiver: 0,
 			}, client.UserId)
 			
-	for i, v := range broker.Clients {
-		fmt.Printf("the %dth user is: %v\n", i, v.UserId)
-	}
+	// for i, v := range broker.Clients {
+	// 	fmt.Printf("the %dth user is: %v\n", i, v.UserId)
+	// }
 
 		// Client disconnected
 		case client := <-broker.Unregister:
